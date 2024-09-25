@@ -25,3 +25,4 @@ resource "aws_instance" "EC2_Server" {
    Name = "terraform-server-example"
  }
 }
+
