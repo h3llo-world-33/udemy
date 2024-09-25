@@ -54,7 +54,7 @@ data "aws_vpc" "default" {
 }
 
 # use the default vpc id and get the default subnets ids 
-data "aws_subnets" "default_subnet_ids" {
+data "aws_subnets_ids" "default_subnet_ids" {
   vpc_id = data.aws_vpc.default.id
 }
 
