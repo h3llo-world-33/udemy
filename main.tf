@@ -43,10 +43,6 @@ resource "aws_launch_configuration" "example" {
     nohup busybox httpd -f -p ${var.server_port} &
     EOF
 
-  tags = {
-    Name = "terraform-server-name"
-  }
-
   lifecycle {
     create_before_destroy = true
   }
@@ -59,7 +55,7 @@ data "aws_vpc" "default" {
 
 # use the default vpc id and get the default subnets ids 
 data "aws_subnet_ids" "default_subnet_ids" {
-  vpc_id = data.aws_vpc_default.default.id
+  vpc_id = data.aws_vpc.default.id
 }
 
 resource "aws_autoscaling_group" "example" {
@@ -113,7 +109,7 @@ resource "aws_lb_listener" "http" {
   default_action {
     type = "fixed-response"
 
-    fixed_response = {
+    fixed_response {
       content_type = "text/plain"
       message_body = "404: page not found"
       status_code = 404
@@ -156,6 +152,6 @@ resource "aws_lb_listener_rule" "asg" {
 }
 
 output "alb_dns_name" {
-  value = aws_lb.example.alb_dns_name
+  value = aws_lb.example.dns_name
   description = "The domain name of the load balancer"
 }
