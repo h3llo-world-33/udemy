@@ -52,3 +52,38 @@ output "public_ip" {
   value = aws_instance.my_server.public_ip
   description = "The public IP address of the web server" #
 }
+
+resource "aws_launch_configuration" "example" {
+  image_id           = "ami-085f9c64a9b75eed5"
+  instance_type = "t2.micro"
+  security_groups = [aws_security_group.instance.id]
+
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update
+    apt-get install -y busybox
+    echo "<html><body><h1>Hello, World</h1></body></html>" > index.html
+    nohup busybox httpd -f -p ${var.server_port} &
+    EOF
+
+  tags = {
+    Name = "terraform-server-name"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = aws_launch_configuration.example.name
+
+  min_size = 2
+  max_size = 10
+
+  tag {
+    key = "Name"
+    value = "terraform-asg-example"
+    propagate_at_launch = true
+  }
+}
