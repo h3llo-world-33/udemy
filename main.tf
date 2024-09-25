@@ -18,6 +18,21 @@ variable "server_port" {
   type = number
 }
 
+resource "aws_instance" "my_server" {
+  ami = "ami-085f9c64a9b75eed5"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.instance.id]
+
+  user_data = <<-EOF
+    #!/bin/bash
+    echo "hello, World" > index.html
+    nohup busybox httpd -f -p ${var.server_port} &
+    EOF
+
+  tags = {
+    Name = "terraform-server-name"
+  }
+}
 resource "aws_security_group" "instance" {
 
   name = "terraform-server-example"
