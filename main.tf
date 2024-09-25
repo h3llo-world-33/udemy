@@ -18,24 +18,6 @@ variable "server_port" {
   type = number
 }
 
-resource "aws_instance" "my_server" {
-  ami           = "ami-085f9c64a9b75eed5"
-  instance_type = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.instance.id]
-
-  user_data = <<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y busybox
-    echo "<html><body><h1>Hello, World</h1></body></html>" > index.html
-    nohup busybox httpd -f -p ${var.server_port} &
-    EOF
-
-  tags = {
-    Name = "terraform-server-name"
-  }
-}
-
 resource "aws_security_group" "instance" {
 
   name = "terraform-server-example"
@@ -46,11 +28,6 @@ resource "aws_security_group" "instance" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-output "public_ip" {
-  value = aws_instance.my_server.public_ip
-  description = "The public IP address of the web server" #
 }
 
 resource "aws_launch_configuration" "example" {
@@ -162,3 +139,23 @@ resource "aws_lb_target_group" "asg" {
   }
 }
 
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = aws_lb_listener.http.arn
+  priority = 1
+
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.asg.arn
+  }
+}
+
+output "alb_dns_name" {
+  value = aws_lb.example.alb_dns_name
+  description = "The domain name of the load balancer"
+}
