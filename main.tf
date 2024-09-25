@@ -20,7 +20,7 @@ variable "server_port" {
 
 resource "aws_security_group" "instance" {
 
-  name = "terraform-server-example1"
+  name = "terraform-server-example"
 
   ingress {
     from_port = var.server_port
