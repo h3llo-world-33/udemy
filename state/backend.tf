@@ -14,7 +14,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "terraform_state" {
 
-    bucket = "terraform-masterclass-bucket"
+    bucket = "terraform-udemy-bucket"
 
     // This is only here so we can destroy the bucket if we need to. you should not copy this for production
     // usage
