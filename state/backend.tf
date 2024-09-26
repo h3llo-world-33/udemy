@@ -12,6 +12,17 @@ provider "aws" {
   region = "us-east-2"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "terraform-udemy-bucket"
+    key = "global/s3/terraform.tfstate"
+    region = "us-east-2"
+
+    dynamodb_table = "terraform-udemy-locks-table"
+    encrypt = true
+  }
+}
+
 resource "aws_s3_bucket" "terraform_state" {
 
     bucket = "terraform-udemy-bucket"
